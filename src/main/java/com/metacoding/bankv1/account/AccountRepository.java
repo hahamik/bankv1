@@ -5,6 +5,8 @@ import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Repository
 public class AccountRepository {
@@ -22,9 +24,10 @@ public class AccountRepository {
     }
 
 
-//    public List<Account> findAccountByUserId(Integer userId) {
-//        Query query = em.createNativeQuery("SELECT * FROM account_tb WHERE user_id = ?", Account.class);
-//        query.setParameter(1, userId);
-//        return query.getResultList();
-//    }
+    public List<Account> findAllByUserId(Integer userId) {
+        Query query = em.createNativeQuery("SELECT * FROM account_tb WHERE user_id = ? ORDER BY created_at DESC", Account.class);
+        query.setParameter(1, userId);
+
+        return query.getResultList();
+    }
 }
