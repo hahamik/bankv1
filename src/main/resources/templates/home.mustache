@@ -3,6 +3,11 @@
 
 <!--마진 : mt, mr, ml, mb (1~5)-->
 <div class="container mt-2">
-    메타코딩
+    <h1>메타코딩에 오신 것을 환영합니다.</h1>
+    <h3>
+        {{#sessionUser}}
+            {{sessionUser.fullname}}님
+        {{/sessionUser}}
+    </h3>
 </div>
 {{>layout/footer}}
