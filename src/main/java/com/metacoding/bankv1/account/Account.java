@@ -21,6 +21,7 @@ public class Account {
     private Integer userId;//FK
     private Timestamp createdAt;
 
+
     public void 잔액변경() {
     }
 }

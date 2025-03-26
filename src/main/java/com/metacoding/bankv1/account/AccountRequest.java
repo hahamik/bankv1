@@ -18,4 +18,11 @@ public class AccountRequest {
         private Integer depositNumber;
         private String withdrawPassword;
     }
+
+    //    public record TranferDTO(
+//            private Integer amount;
+//            private Integer withdrawNumber;
+//            private Integer depositNumber;
+//            private String withdrawPassword;
+//    ){}
 }

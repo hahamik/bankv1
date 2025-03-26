@@ -19,6 +19,7 @@ public class History {
     private Integer depositNumber;// FK/2222
     private Integer amount;
     private Integer withdrawBalance;// 그 시점의 잔액
+    private Integer depositBalance;
     private Timestamp createdAt;
 
 }

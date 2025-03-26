@@ -6,7 +6,9 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -79,5 +81,18 @@ public class AccountController {
         }
         accountService.계좌이체(transferDTO, sessionUser.getId());
         return "redirect:/";//TODO
+    }
+
+    // /account/1111?type=입금
+    // /account/1111?type=출금
+    // /account/1111?type=전체
+    @GetMapping("/account/{number}")
+    public String detail(@PathVariable("number") int number, @RequestParam(value = "type", required = false, defaultValue = "전체") String type) {
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            throw new RuntimeException("로그인이 필요합니다.");
+        }
+        accountService.계좌상세보기(number, type, sessionUser.getId());
+        return "account/detail";
     }
 }

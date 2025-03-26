@@ -59,7 +59,20 @@ public class AccountService {
         accountRepository.updateNumber(depositAccount.getPassword(), depositBalance, depositAccount.getNumber());
 
         // 10. history save  여기선 위에서 다 검증해서 dto에 있는 데이터 써도 됨
-        historyRepository.save(transferDTO.getWithdrawNumber(), transferDTO.getDepositNumber(), transferDTO.getAmount(), withdrawBalance);
+        historyRepository.save(transferDTO.getWithdrawNumber(), transferDTO.getDepositNumber(), transferDTO.getAmount(), withdrawBalance, depositBalance);
+
+    }
+
+
+    public void 계좌상세보기(int number, String type, Integer sessionUserId) {
+        // 1. 계좌 존재 확인
+        Account account = accountRepository.findByNumber(number);
+        if (account == null) throw new RuntimeException("출금계좌가 존재하지 않습니다.");
+
+        // 2. 계좌 주인 확인
+        if (!(account.getUserId().equals(sessionUserId))) throw new RuntimeException("출금계좌의 권한이 없습니다.");
+
+        // 3. 조회해서 주면됨
 
     }
 }
