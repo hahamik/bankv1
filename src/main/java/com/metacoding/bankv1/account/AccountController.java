@@ -30,8 +30,7 @@ public class AccountController {
             throw new RuntimeException("로그인이 필요합니다.");
         }
 
-        System.out.println(sessionUser.getId()); // null 체크 후 호출
-        return "account/save-form";
+        return "account/save-form";// null 체크 후 호출
     }
 
 
@@ -45,7 +44,7 @@ public class AccountController {
         }
         // /인증체크 코드
         accountService.계좌생성(saveDTO, sessionUser.getId());
-        return "redirect:/";
+        return "redirect:/account";
     }
 
     @GetMapping("/account")
@@ -61,5 +60,24 @@ public class AccountController {
         // view로 넘기기
         request.setAttribute("models", accountList);
         return "account/list";
+    }
+
+    @GetMapping("/account/transfer-form")
+    public String transferForm() {
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            throw new RuntimeException("로그인이 필요합니다.");
+        }
+        return "account/transfer-form";
+    }
+
+    @PostMapping("/account/transfer")
+    public String transfer(AccountRequest.TransferDTO transferDTO, HttpSession session) {
+        User sessionUser = (User) session.getAttribute("sessionUser");
+        if (sessionUser == null) {
+            throw new RuntimeException("로그인이 필요합니다.");
+        }
+        accountService.계좌이체(transferDTO, sessionUser.getId());
+        return "redirect:/";//TODO
     }
 }
