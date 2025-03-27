@@ -8,9 +8,9 @@ public class AccountResponse {
     @AllArgsConstructor
     @Data
     public static class DetailDTO {
-        private String accountOwner;
         private int accountNumber;
         private int accountBalance;
+        private String accountOwner;
         private String createdAt;
         private int wNumber;
         private int dNumber;

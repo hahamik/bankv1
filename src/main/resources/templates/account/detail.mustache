@@ -23,21 +23,27 @@
             <th>입금계좌</th>
             <th>금액</th>
             <th>계좌잔액</th>
-            <th>입금/출금</th>
+            <th>출금/입금</th>
         </tr>
         </thead>
         <tbody>
+
         {{#models}}
             <tr>
                 <td>{{createdAt}}</td>
                 <td>{{wNumber}}</td>
                 <td>{{dNumber}}</td>
-                <td>{{amount}}</td>
-                <td>{{balance}}</td>
+                <td>{{amount}}원</td>
+                <td>{{balance}}원</td>
                 <td>{{type}}</td>
             </tr>
         {{/models}}
+
         </tbody>
     </table>
 </div>
+
 {{>layout/footer}}
+
+
+

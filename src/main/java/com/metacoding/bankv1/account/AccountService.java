@@ -1,6 +1,5 @@
 package com.metacoding.bankv1.account;
 
-
 import com.metacoding.bankv1.account.history.HistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class AccountService {
-
     private final AccountRepository accountRepository;
     private final HistoryRepository historyRepository;
 
@@ -20,60 +18,45 @@ public class AccountService {
         accountRepository.save(saveDTO.getNumber(), saveDTO.getPassword(), saveDTO.getBalance(), userId);
     }
 
-    @Transactional
-    public List<Account> 계좌목록(Integer userId) {
+    public List<Account> 나의계좌목록(Integer userId) {
         return accountRepository.findAllByUserId(userId);
     }
 
     @Transactional
-    public void 계좌이체(AccountRequest.TransferDTO transferDTO, Integer userId) {
-        // {부가로직}
-        // 1. 출금 계좌 조회
+    public void 계좌이체(AccountRequest.TransferDTO transferDTO, int sessionUserId) {
         Account withdrawAccount = accountRepository.findByNumber(transferDTO.getWithdrawNumber());
-        // 2. 출금 계좌 없으면 RuntimeException
-        if (withdrawAccount == null) throw new RuntimeException("출금계좌가 존재하지 않습니다.");
-        // 3. 입금 계좌 조회
+        if (withdrawAccount == null) throw new RuntimeException("출금 계좌가 존재하지 않습니다");
+
         Account depositAccount = accountRepository.findByNumber(transferDTO.getDepositNumber());
-        // 4. 입금 계좌 없으면 RuntimeException
-        if (depositAccount == null) throw new RuntimeException("입금계좌가 존재하지 않습니다.");
-        // 5. 출금 계좌의 잔액 조회  amount와 잔액 비교(출금계좌와) amount가 더 크면 RuntimeException
-        if (withdrawAccount.getBalance() < transferDTO.getAmount()) {
-            throw new RuntimeException("출금 계좌의 잔액 : " + withdrawAccount.getBalance() + ", 이체하려는 금액 : " + transferDTO.getAmount());
-        }
-        // 6. 출금 비밀번호 확인(동일한지 체크 withdrawNumber의 password와 password)
-        if (!(withdrawAccount.getPassword().equals(transferDTO.getWithdrawPassword())))
-            throw new RuntimeException("출금 계좌 비밀번호가 틀렸습니다.");
+        if (depositAccount == null) throw new RuntimeException("입금 계좌가 존재하지 않습니다");
 
-        // {부가로직}
+        withdrawAccount.잔액검사(transferDTO.getAmount());
 
-        // 7. 출금계좌와 로그인한 유저가 동일한 인물인지 권한 체크
-        if (!(withdrawAccount.getUserId().equals(userId))) throw new RuntimeException("출금계좌의 권한이 없습니다.");
+        withdrawAccount.비밀번호검사(transferDTO.getWithdrawPassword());
 
-        // 8. account update 출금계좌 잔액 변경
-        int withdrawBalance = withdrawAccount.getBalance();
-        withdrawBalance -= transferDTO.getAmount();
-        accountRepository.updateNumber(withdrawAccount.getPassword(), withdrawBalance, withdrawAccount.getNumber());
-        // 9. account update 출금계좌 잔액 변경
-        int depositBalance = depositAccount.getBalance();
-        depositBalance += transferDTO.getAmount();
-        accountRepository.updateNumber(depositAccount.getPassword(), depositBalance, depositAccount.getNumber());
+        withdrawAccount.계좌주인검사(sessionUserId);
 
-        // 10. history save  여기선 위에서 다 검증해서 dto에 있는 데이터 써도 됨
-        historyRepository.save(transferDTO.getWithdrawNumber(), transferDTO.getDepositNumber(), transferDTO.getAmount(), withdrawBalance, depositBalance);
+        withdrawAccount.출금(transferDTO.getAmount());
+        accountRepository.updateByNumber(withdrawAccount.getBalance(), withdrawAccount.getPassword(), withdrawAccount.getNumber());
 
+        depositAccount.입금(transferDTO.getAmount());
+        accountRepository.updateByNumber(depositAccount.getBalance(), depositAccount.getPassword(), depositAccount.getNumber());
+
+        historyRepository.save(transferDTO.getWithdrawNumber(), transferDTO.getDepositNumber(), transferDTO.getAmount(), withdrawAccount.getBalance(), depositAccount.getBalance());
     }
-
 
     public List<AccountResponse.DetailDTO> 계좌상세보기(int number, String type, Integer sessionUserId) {
         // 1. 계좌 존재 확인
         Account account = accountRepository.findByNumber(number);
-        if (account == null) throw new RuntimeException("출금계좌가 존재하지 않습니다.");
+        if (account == null) throw new RuntimeException("계좌가 존재하지 않습니다");
 
         // 2. 계좌 주인 확인
-        if (!(account.getUserId().equals(sessionUserId))) throw new RuntimeException("출금계좌의 권한이 없습니다.");
+        account.계좌주인검사(sessionUserId);
 
-        // 3. 조회해서 주면됨
-        List<AccountResponse.DetailDTO> detailList = historyRepository.findAllByNumber(number, type);
+        // 3. 조회해서 주면 됨
+        List<AccountResponse.DetailDTO> detailList = accountRepository.findAllByNumber(number, type);
         return detailList;
+
     }
+
 }
