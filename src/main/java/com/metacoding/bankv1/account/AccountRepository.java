@@ -49,6 +49,7 @@ public class AccountRepository {
         }
     }
 
+
 //    public void updateWithdraw(int amount, int number) {
 //        Query query = em.createNativeQuery("update account_tb set balance = balance - ? where number = ?");
 //        query.setParameter(1, amount);

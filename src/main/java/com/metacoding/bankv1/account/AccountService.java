@@ -64,7 +64,7 @@ public class AccountService {
     }
 
 
-    public void 계좌상세보기(int number, String type, Integer sessionUserId) {
+    public List<AccountResponse.DetailDTO> 계좌상세보기(int number, String type, Integer sessionUserId) {
         // 1. 계좌 존재 확인
         Account account = accountRepository.findByNumber(number);
         if (account == null) throw new RuntimeException("출금계좌가 존재하지 않습니다.");
@@ -73,6 +73,7 @@ public class AccountService {
         if (!(account.getUserId().equals(sessionUserId))) throw new RuntimeException("출금계좌의 권한이 없습니다.");
 
         // 3. 조회해서 주면됨
-
+        List<AccountResponse.DetailDTO> detailList = historyRepository.findAllByNumber(number, type);
+        return detailList;
     }
 }
